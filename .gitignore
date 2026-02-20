@@ -1,0 +1,9 @@
+# binaries
+clawtop
+
+# go
+/bin/
+/dist/
+
+# editor
+.DS_Store

@@ -71,8 +71,13 @@ func New(cfg Config) tea.Model {
 	if m.refresh <= 0 {
 		m.refresh = 2 * time.Second
 	}
+	// sensible defaults (clean, low-noise)
+	m.filter24h = true
+	m.hideRunSessions = true
+	m.primaryModelOnly = true
 	m.levels = map[openclaw.TaskLevel]bool{openclaw.LevelError: true, openclaw.LevelWarn: true, openclaw.LevelInfo: true, openclaw.LevelDebug: false}
-	m.sources = map[openclaw.TaskSource]bool{openclaw.SourceCron: true, openclaw.SourceSubagent: true, openclaw.SourceTool: true}
+	// tool tasks can be very noisy; default off
+	m.sources = map[openclaw.TaskSource]bool{openclaw.SourceCron: true, openclaw.SourceSubagent: true, openclaw.SourceTool: false}
 	return m
 }
 
@@ -170,11 +175,15 @@ func (m model) View() string {
 		sub += "  err=" + m.err.Error()
 	}
 
-	filters := fmt.Sprintf("[1]24h:%s [2]hide:run:%s [3]primary(%s):%s  levels e:%s w:%s i:%s d:%s  src c:%s s:%s t:%s  r refresh  +/- rate  q quit",
-		onOff(m.filter24h), onOff(m.hideRunSessions), m.primaryModel, onOff(m.primaryModelOnly),
+	filters := fmt.Sprintf(
+		"Filters: 24h[1]=%s  hide:run[2]=%s  primary[3]=%s (%s)  levels e/w/i/d=%s%s%s%s  src c/s/t=%s%s%s",
+		onOff(m.filter24h),
+		onOff(m.hideRunSessions),
+		onOff(m.primaryModelOnly), m.primaryModel,
 		onOff(m.levels[openclaw.LevelError]), onOff(m.levels[openclaw.LevelWarn]), onOff(m.levels[openclaw.LevelInfo]), onOff(m.levels[openclaw.LevelDebug]),
 		onOff(m.sources[openclaw.SourceCron]), onOff(m.sources[openclaw.SourceSubagent]), onOff(m.sources[openclaw.SourceTool]),
 	)
+	legend := dimStyle.Render("Keys: r refresh  +/- rate  q quit")
 
 	leftW := m.width/2 - 1
 	if leftW < 40 {
@@ -196,7 +205,7 @@ func (m model) View() string {
 
 	body := lipgloss.JoinHorizontal(lipgloss.Top, left.Render(leftBody), right.Render(rightBody))
 
-	return strings.Join([]string{header + "  " + sub, filters, body}, "\n") + "\n"
+	return strings.Join([]string{header + "  " + sub, filters, body, legend}, "\n") + "\n"
 }
 
 func (m model) refreshNowCmd() tea.Cmd {

@@ -1,5 +1,5 @@
-# binaries
-clawtop
+# binaries (repo root)
+/clawtop
 
 # go
 /bin/

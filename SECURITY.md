@@ -1,7 +1,14 @@
 # SECURITY.md — clawtop
 
-This project follows the workspace-wide security baseline defined in
-[`../SECURITY_BASELINE.md`](../SECURITY_BASELINE.md).
+## Baseline principles (inlined)
+
+- **Least privilege**: no unnecessary permissions, no root.
+- **No secrets in repo**: no tokens/keys/passwords in code, docs, or systemd units.
+- **Safe by default**: explicit opt-in for risky flags/features.
+- **Defensive parsing**: inputs treated as untrusted; set limits, handle errors cleanly.
+- **No `eval` / unsafe shelling-out**: subprocesses use argument lists only.
+- **Logging**: minimize sensitive data in logs; debug logs only when needed.
+- **Dependency hygiene**: keep deps minimal; run vuln scans periodically.
 
 ---
 
